@@ -89,6 +89,11 @@
         <pre class="mt-3 bg-white border rounded p-3 text-xs overflow-auto">{{ formattedReportResponse }}</pre>
       </details>
 
+      <div v-if="reportMarkdown" class="mt-6">
+        <h2 class="text-lg font-semibold text-gray-800 mb-2">Rendered Report</h2>
+        <MarkdownRenderer :content="reportMarkdown" />
+      </div>
+
     </div>
   </div>
 </template>
@@ -98,6 +103,7 @@ import { onMounted, ref, computed } from 'vue'
 import { requestIdentifyBreaks, getCachedIdentifyBreaks, requestBreaksFixer, getCachedBreaksFixer, requestReportGeneration, getCachedReport } from '@/services/workflowService'
 import BreakDisplay from '@/components/BreakDisplay.vue'
 import BreakSummary from '@/components/BreakSummary.vue'
+import MarkdownRenderer from '@/components/MarkdownRenderer.vue'
 
 const nbimFile = ref<File | null>(null)
 const custodyFile = ref<File | null>(null)
@@ -124,6 +130,20 @@ const formattedReportResponse = computed(() =>
   reportResponseData.value ? JSON.stringify(reportResponseData.value, null, 2) : ''
 )
 
+const reportMarkdown = computed(() => {
+  const result = reportResponseData.value?.result
+  if (!result) return ''
+  if (typeof result.output_text === 'string' && result.output_text.trim().length > 0) {
+    return result.output_text
+  }
+  // Fallback: if output_parsed contains markdown under final_report or similar
+  try {
+    if (result.output_parsed?.final_report && typeof result.output_parsed.final_report === 'string') {
+      return result.output_parsed.final_report
+    }
+  } catch {}
+  return ''
+})
 const classifiedBreaks = computed(() => {
   const result = responseData.value?.result
   if (!result) return null
