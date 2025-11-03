@@ -70,6 +70,9 @@
         :auto-count="fixerAuto.length"
         :manual-count="fixerManual.length"
       />
+      <div v-if="fixerClassified && fixerAuto.length === 0" class="mt-3 p-3 rounded-lg border border-amber-200 bg-amber-50 text-amber-800 text-sm">
+        <span class="font-semibold">Note:</span> No automatic fixes were present, so the content is the same as the previous option.
+      </div>
       <BreakDisplay
         v-if="fixerClassified && (fixerAuto.length || fixerManual.length)"
         :auto-candidates="fixerAuto"
