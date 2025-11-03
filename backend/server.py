@@ -1,6 +1,7 @@
 import os
 import asyncio
 import logging
+import json
 from dotenv import load_dotenv
 from fastapi import FastAPI, UploadFile, File, Form
 from main import run_workflow, WorkflowInput
@@ -38,9 +39,49 @@ app.add_middleware(
 )
 
 
+def _format_context_block(context_str: str) -> str:
+    """Format context JSON string into delimited blocks appended to the prompt.
+
+    Only includes known keys if present: validation_results, breaks_found_global,
+    classified_breaks, corrections_list.
+    """
+    if not context_str:
+        return ""
+    try:
+        data = json.loads(context_str)
+        if not isinstance(data, dict):
+            return ""
+    except Exception:
+        logger.warning("Malformed context JSON received; ignoring.")
+        return ""
+
+    known_keys = [
+        "validation_results",
+        "breaks_found_global",
+        "classified_breaks",
+        "corrections_list",
+    ]
+
+    parts: list[str] = []
+    included: list[str] = []
+    for key in known_keys:
+        if key in data and isinstance(data[key], (dict, list)):
+            try:
+                pretty = json.dumps(data[key], indent=2)
+            except Exception:
+                pretty = str(data[key])
+            parts.append(f"\n\n--- CONTEXT {key} START ---\n{pretty}\n--- CONTEXT {key} END ---\n")
+            included.append(key)
+
+    if included:
+        logger.info(f"Context keys included: {', '.join(included)}")
+    return "".join(parts)
+
+
 @app.post("/api/run-workflow")
 async def run_agent_workflow(
     input_as_text: str = Form(...),
+    context: str = Form(None),
     nbim_file: UploadFile = File(None),
     custody_file: UploadFile = File(None)
 ):
@@ -74,7 +115,10 @@ async def run_agent_workflow(
             logger.debug(f"Custody CSV size: {len(custody_text)} characters")
 
         # Merge into one big prompt
-        merged_prompt = f"{input_as_text.strip()}\n\n{extra_text}"
+        context_block = _format_context_block(context) if context else ""
+        merged_prompt = f"{input_as_text.strip()}\n\n{extra_text}{context_block}"
+        if context_block:
+            logger.info(f"Context block length added: {len(context_block)} characters")
         logger.info(f"Final merged prompt length: {len(merged_prompt)} characters")
 
         # Call your workflow
