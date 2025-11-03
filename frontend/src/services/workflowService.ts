@@ -46,16 +46,6 @@ export async function requestIdentifyBreaks(nbimFile: File, custodyFile: File): 
   const nbimSig = buildSignature(nbimFile)
   const custodySig = buildSignature(custodyFile)
 
-  const cached = readCache<IdentifyBreaksCache>(KEY_IDENTIFY)
-  if (cached &&
-      cached.fileSignatures?.nbim?.name === nbimSig.name &&
-      cached.fileSignatures?.nbim?.size === nbimSig.size &&
-      cached.fileSignatures?.nbim?.lastModified === nbimSig.lastModified &&
-      cached.fileSignatures?.custody?.name === custodySig.name &&
-      cached.fileSignatures?.custody?.size === custodySig.size &&
-      cached.fileSignatures?.custody?.lastModified === custodySig.lastModified) {
-    return cached.response
-  }
 
   const formData = new FormData()
   formData.append('input_as_text', 'Identify breaks between nbim and custody files')
@@ -82,13 +72,9 @@ export function getCachedIdentifyBreaks(): any | null {
 }
 
 // 2) Breaks Fixer (feedback flow)
-export async function requestBreaksFixer(feedback: any): Promise<any> {
-  const cached = readCache<SimpleCache>(KEY_FIXER)
-  if (cached) return cached.response
-
+export async function requestBreaksFixer(): Promise<any> {
   const formData = new FormData()
-  formData.append('input_as_text', 'Apply feedback to breaks suggestions and return updated state')
-  formData.append('feedback', JSON.stringify(feedback))
+  formData.append('input_as_text', 'Can u fix the breaks?')
 
   const { data } = await axios.post(`${API_BASE}/api/run-workflow`, formData)
   if (data && data.success === false) {
@@ -105,9 +91,6 @@ export function getCachedBreaksFixer(): any | null {
 
 // 3) Report Generation
 export async function requestReportGeneration(): Promise<any> {
-  const cached = readCache<SimpleCache>(KEY_REPORT)
-  if (cached) return cached.response
-
   const formData = new FormData()
   formData.append('input_as_text', 'Generate a reconciliation report based on the current state')
 
