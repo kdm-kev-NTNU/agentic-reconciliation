@@ -142,3 +142,5 @@ All prompt templates are in `prompt_docs/` and correspond to the pipeline stages
 - `4_classification_agent.md`: Break Classification & Human Review with prioritization and confidence.
 - `5_correction_agent.md`: Correction & Audit Execution with safe auto‑corrections and manual recommendations.
 - `6_auditing_agent.md`: Audit Trail & Report Generation that aggregates results into Markdown.
+
+source: https://platform.openai.com/docs/guides/prompt-engineering 
