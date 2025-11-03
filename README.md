@@ -149,20 +149,25 @@ source: https://platform.openai.com/docs/guides/prompt-engineering
 
 ### Accuracy
 
-- Backtesting & RAG (NBIM’s procedures)
-- Repeat batches – check inconsistency
-- Perform backtests using historical dividend reconciliation cases to evaluate model precision and error consistency.
-- Implement RAG (Retrieval-Augmented Generation) so agents can reference NBIM procedures and industry standards — ensuring consistent decision logic.
-- Running the same batch several times to check which suggestions stay consistent, since the model isn’t perfectly deterministic. – this makes correction and improvement more stable
+### Backtesting & RAG Integration (aligned with NBIM’s procedures)
+
+Conduct systematic backtesting on historical reconciliation cases to quantify model accuracy and identify recurring error patterns.
+Integrate Retrieval-Augmented Generation (RAG) so that agents can reference NBIM’s internal procedures and relevant financial standards, ensuring that decisions remain consistent, auditable, and aligned with institutional policy.
+
+### Batch Consistency Testing
+
+Re-run identical batches multiple times to measure response stability and detect variance.
+Since LLMs are non-deterministic, this step ensures reproducibility benchmarks and provides a stable baseline for further tuning.
 
 ### Scalability
 
-- Scalability – fewer dependencies
-- Ensuring Scalability
-- Restructure the to reduce human dependency and number of agents to increasing automation efficiency.
+Reducing Human and System Dependencies
+Redesign the workflow to minimize manual interventions and agent-to-agent dependencies as model reliability increases.
+Consolidating simpler agents into larger reasoning models can enhance throughput and lower coordination overhead — enabling horizontal scalability as data volume grows.
 
 ### In-house model development
 
-- In-house model development – more control and:
-- Developing an in-house model would allow NBIM to tailor the system to its own reconciliation logic, ensuring stricter data governance and full control over sensitive financial information — while reducing long-term dependency on third-party APIs.
+- Data Control and Long-Term Resilience
+Developing an in-house reconciliation model would allow NBIM to embed its proprietary logic directly into the architecture, maintaining full control over data handling and model behavior.
+This approach strengthens compliance with data residency regulations, enhances security, and reduces long-term dependency on external APIs — while allowing continuous fine-tuning based on NBIM’s evolving reconciliation policies.
 
