@@ -1,58 +1,138 @@
 <template>
   <div class="flex flex-col items-center justify-center min-h-screen bg-gray-50 p-6">
-    <div class="w-full max-w-xl bg-white rounded-2xl shadow-lg p-8 text-center">
-      <h1 class="text-2xl font-bold mb-6 text-gray-800">🌤 Agent Workflow Test</h1>
+    <div class="bg-white shadow-lg rounded-2xl p-8 w-full max-w-md text-center">
+      <h1 class="text-2xl font-bold mb-6 text-gray-800">Identify Breaks</h1>
 
-      <div v-if="loading" class="text-gray-500 animate-pulse">
-        Asking the model: “What is the weather like today?”
+      <!-- NBIM file upload -->
+      <div class="mb-4">
+        <label class="block text-gray-700 font-medium mb-2">NBIM File</label>
+        <input
+          type="file"
+          @change="handleNbimFile"
+          class="w-full border border-gray-300 rounded-lg p-2"
+        />
       </div>
 
-      <div v-else-if="error" class="text-red-500 mt-4">
-        {{ error }}
+      <!-- Custody file upload -->
+      <div class="mb-6">
+        <label class="block text-gray-700 font-medium mb-2">Custody File</label>
+        <input
+          type="file"
+          @change="handleCustodyFile"
+          class="w-full border border-gray-300 rounded-lg p-2"
+        />
       </div>
 
-      <div v-else class="text-gray-800 mt-4 whitespace-pre-line">
-        {{ response }}
-      </div>
-
+      <!-- Identify Breaks button -->
       <button
-        @click="fetchResponse"
-        class="mt-8 px-6 py-3 bg-blue-600 text-white font-medium rounded-xl hover:bg-blue-700 transition"
+        @click="identifyBreaks"
+        :disabled="!nbimFile || !custodyFile || isLoading"
+        class="w-full py-3 rounded-xl font-semibold text-white transition
+               disabled:bg-gray-400 disabled:cursor-not-allowed
+               bg-blue-600 hover:bg-blue-700"
       >
-        Ask Again
+        Identify Breaks
       </button>
+
+    </div>
+
+    <div v-if="isLoading" class="mt-4 text-blue-700">Processing…</div>
+
+    <div v-if="errorMessage" class="mt-4 p-3 rounded bg-red-100 text-red-800">{{ errorMessage }}</div>
+
+    <div v-if="responseData" class="mt-6 space-y-6 w-full text-left">
+      <BreakSummary v-if="classifiedBreaks"
+        :summary="summary"
+        :auto-count="autoCandidates.length"
+        :manual-count="manualCandidates.length"
+      />
+      <BreakDisplay
+        v-if="classifiedBreaks && (autoCandidates.length || manualCandidates.length)"
+        :auto-candidates="autoCandidates"
+        :manual-candidates="manualCandidates"
+      />
+
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import axios from 'axios'
+import { onMounted, ref, computed } from 'vue'
+import { requestIdentifyBreaks, getCachedIdentifyBreaks } from '@/services/workflowService'
+import BreakDisplay from '@/components/BreakDisplay.vue'
+import BreakSummary from '@/components/BreakSummary.vue'
 
-const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:3001'
+const nbimFile = ref<File | null>(null)
+const custodyFile = ref<File | null>(null)
 
-const response = ref('')
-const error = ref<string | null>(null)
-const loading = ref(false)
+const isLoading = ref(false)
+const errorMessage = ref<string | null>(null)
+const responseData = ref<any | null>(null)
 
-const userText = 'What is the weather like today?'
+const formattedResponse = computed(() =>
+  responseData.value ? JSON.stringify(responseData.value, null, 2) : ''
+)
 
-async function fetchResponse() {
-  loading.value = true
-  error.value = null
-  response.value = ''
+const classifiedBreaks = computed(() => {
+  const result = responseData.value?.result
+  if (!result) return null
+  if (result.output_parsed?.classified_breaks) {
+    return result.output_parsed.classified_breaks
+  }
+  if (result.output_text) {
+    try {
+      const parsed = JSON.parse(result.output_text)
+      return parsed?.classified_breaks ?? null
+    } catch {
+      return null
+    }
+  }
+  return null
+})
 
-  try {
-    const res = await axios.post(`${API_BASE}/api/run-workflow`, {
-      input_as_text: userText,
-    })
-    response.value = res.data.result || 'No response received.'
-  } catch (err: any) {
-    error.value = err.message || 'Failed to contact backend.'
-  } finally {
-    loading.value = false
+const summary = computed(() => classifiedBreaks.value?.summary ?? null)
+const autoCandidates = computed(() => classifiedBreaks.value?.auto_candidates ?? [])
+const manualCandidates = computed(() => classifiedBreaks.value?.manual_candidates ?? [])
+
+
+const handleNbimFile = (event: Event) => {
+  const target = event.target as HTMLInputElement
+  const file = target.files?.item(0)
+  if (file) {
+    nbimFile.value = file
   }
 }
 
-onMounted(fetchResponse)
+const handleCustodyFile = (event: Event) => {
+  const target = event.target as HTMLInputElement
+  const file = target.files?.item(0)
+  if (file) {
+    custodyFile.value = file
+  }
+}
+
+const identifyBreaks = async () => {
+  if (!nbimFile.value || !custodyFile.value) return
+
+  isLoading.value = true
+  errorMessage.value = null
+  responseData.value = null
+
+  try {
+    const data = await requestIdentifyBreaks(nbimFile.value, custodyFile.value)
+    responseData.value = data
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'Unexpected error'
+    errorMessage.value = message
+  } finally {
+    isLoading.value = false
+  }
+}
+
+onMounted(() => {
+  const cached = getCachedIdentifyBreaks()
+  if (cached) {
+    responseData.value = cached
+  }
+})
 </script>
