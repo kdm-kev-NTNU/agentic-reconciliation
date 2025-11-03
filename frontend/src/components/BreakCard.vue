@@ -5,7 +5,10 @@
         <div class="text-sm text-gray-500">Break ID</div>
         <div class="text-lg font-semibold text-gray-800">{{ item.break_id }}</div>
       </div>
-      <span v-if="item.priority" :class="priorityBadgeClass(item.priority)">{{ item.priority }}</span>
+      <div class="flex items-center gap-2">
+        <span v-if="item.accepted" class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">Accepted</span>
+        <span v-if="item.priority" :class="priorityBadgeClass(item.priority)">{{ item.priority }}</span>
+      </div>
     </div>
 
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
