@@ -29,13 +29,13 @@
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
 
-const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:3001"
+const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:3001'
 
 const response = ref('')
 const error = ref<string | null>(null)
 const loading = ref(false)
 
-const userText = "What is the weather like today?"
+const userText = 'What is the weather like today?'
 
 async function fetchResponse() {
   loading.value = true
@@ -44,7 +44,7 @@ async function fetchResponse() {
 
   try {
     const res = await axios.post(`${API_BASE}/api/run-workflow`, {
-      input_as_text: userText
+      input_as_text: userText,
     })
     response.value = res.data.result || 'No response received.'
   } catch (err: any) {
