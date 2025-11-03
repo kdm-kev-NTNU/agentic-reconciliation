@@ -41,11 +41,19 @@ const writeCache = (key: string, value: any) => {
   }
 }
 
+const clearAllCache = (): void => {
+  try {
+    localStorage.clear()
+  } catch {
+    // ignore storage errors
+  }
+}
+
 // 1) Identify Breaks
 export async function requestIdentifyBreaks(nbimFile: File, custodyFile: File): Promise<any> {
   const nbimSig = buildSignature(nbimFile)
   const custodySig = buildSignature(custodyFile)
-
+  clearAllCache()
 
   const formData = new FormData()
   formData.append('input_as_text', 'Identify breaks between nbim and custody files')
@@ -74,7 +82,7 @@ export function getCachedIdentifyBreaks(): any | null {
 // 2) Breaks Fixer (feedback flow)
 export async function requestBreaksFixer(): Promise<any> {
   const formData = new FormData()
-  formData.append('input_as_text', 'Can u fix the breaks?')
+  formData.append('input_as_text', 'Can u fix the automatic break suggestions?')
 
   const { data } = await axios.post(`${API_BASE}/api/run-workflow`, formData)
   if (data && data.success === false) {
