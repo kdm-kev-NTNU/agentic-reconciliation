@@ -34,14 +34,28 @@
         Identify Breaks
       </button>
 
-      <div v-if="isLoading" class="mt-4 text-blue-700">Processing…</div>
+    </div>
 
-      <div v-if="errorMessage" class="mt-4 p-3 rounded bg-red-100 text-red-800">{{ errorMessage }}</div>
+    <div v-if="isLoading" class="mt-4 text-blue-700">Processing…</div>
 
-      <div v-if="responseData" class="mt-4 text-left">
-        <h2 class="text-lg font-semibold text-gray-800 mb-2">Response</h2>
-        <pre class="bg-gray-100 p-3 rounded text-sm overflow-auto">{{ formattedResponse }}</pre>
-      </div>
+    <div v-if="errorMessage" class="mt-4 p-3 rounded bg-red-100 text-red-800">{{ errorMessage }}</div>
+
+    <div v-if="responseData" class="mt-6 space-y-6 w-full text-left">
+      <BreakSummary v-if="classifiedBreaks"
+        :summary="summary"
+        :auto-count="autoCandidates.length"
+        :manual-count="manualCandidates.length"
+      />
+      <BreakDisplay
+        v-if="classifiedBreaks && (autoCandidates.length || manualCandidates.length)"
+        :auto-candidates="autoCandidates"
+        :manual-candidates="manualCandidates"
+      />
+
+      <details class="bg-gray-50 border rounded-xl p-4">
+        <summary class="cursor-pointer text-sm text-gray-600">Show raw JSON</summary>
+        <pre class="mt-3 bg-white border rounded p-3 text-xs overflow-auto">{{ formattedResponse }}</pre>
+      </details>
     </div>
   </div>
 </template>
@@ -49,6 +63,8 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import axios from 'axios'
+import BreakDisplay from '@/components/BreakDisplay.vue'
+import BreakSummary from '@/components/BreakSummary.vue'
 
 const nbimFile = ref<File | null>(null)
 const custodyFile = ref<File | null>(null)
@@ -60,6 +76,28 @@ const responseData = ref<any | null>(null)
 const formattedResponse = computed(() =>
   responseData.value ? JSON.stringify(responseData.value, null, 2) : ''
 )
+
+const classifiedBreaks = computed(() => {
+  const result = responseData.value?.result
+  if (!result) return null
+  if (result.output_parsed?.classified_breaks) {
+    return result.output_parsed.classified_breaks
+  }
+  if (result.output_text) {
+    try {
+      const parsed = JSON.parse(result.output_text)
+      return parsed?.classified_breaks ?? null
+    } catch {
+      return null
+    }
+  }
+  return null
+})
+
+const summary = computed(() => classifiedBreaks.value?.summary ?? null)
+const autoCandidates = computed(() => classifiedBreaks.value?.auto_candidates ?? [])
+const manualCandidates = computed(() => classifiedBreaks.value?.manual_candidates ?? [])
+
 
 const handleNbimFile = (event: Event) => {
   const target = event.target as HTMLInputElement
