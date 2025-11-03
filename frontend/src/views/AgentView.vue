@@ -65,11 +65,19 @@
 
       <div v-if="fixerErrorMessage" class="mt-2 p-3 rounded bg-red-100 text-red-800">{{ fixerErrorMessage }}</div>
 
-
-      <details v-if="fixerResponseData" class="bg-gray-50 border rounded-xl p-4">
-        <summary class="cursor-pointer text-sm text-gray-600">Show raw Breaks Fixer JSON</summary>
-        <pre class="mt-3 bg-white border rounded p-3 text-xs overflow-auto">{{ formattedFixerResponse }}</pre>
-      </details>
+      <BreakSummary v-if="fixerClassified"
+        :summary="fixerSummary"
+        :auto-count="fixerAuto.length"
+        :manual-count="fixerManual.length"
+      />
+      <div v-if="fixerClassified && fixerAuto.length === 0" class="mt-3 p-3 rounded-lg border border-amber-200 bg-amber-50 text-amber-800 text-sm">
+        <span class="font-semibold">Note:</span> No automatic fixes were present, so the content is the same as the previous option.
+      </div>
+      <BreakDisplay
+        v-if="fixerClassified && (fixerAuto.length || fixerManual.length)"
+        :auto-candidates="fixerAuto"
+        :manual-candidates="fixerManual"
+      />
 
       <div v-if="fixerResponseData" class="mt-3 flex items-center gap-3">
         <button
@@ -84,10 +92,7 @@
 
       <div v-if="reportErrorMessage" class="mt-2 p-3 rounded bg-red-100 text-red-800">{{ reportErrorMessage }}</div>
 
-      <details v-if="reportResponseData" class="bg-gray-50 border rounded-xl p-4">
-        <summary class="cursor-pointer text-sm text-gray-600">Show raw Report JSON</summary>
-        <pre class="mt-3 bg-white border rounded p-3 text-xs overflow-auto">{{ formattedReportResponse }}</pre>
-      </details>
+      
 
       <div v-if="reportMarkdown" class="mt-6">
         <h2 class="text-lg font-semibold text-gray-800 mb-2">Rendered Report</h2>
@@ -122,13 +127,26 @@ const formattedResponse = computed(() =>
   responseData.value ? JSON.stringify(responseData.value, null, 2) : ''
 )
 
-const formattedFixerResponse = computed(() =>
-  fixerResponseData.value ? JSON.stringify(fixerResponseData.value, null, 2) : ''
-)
-
-const formattedReportResponse = computed(() =>
-  reportResponseData.value ? JSON.stringify(reportResponseData.value, null, 2) : ''
-)
+// Parsed fixer results
+const fixerClassified = computed(() => {
+  const result = fixerResponseData.value?.result
+  if (!result) return null
+  if (result.output_parsed?.classified_breaks) {
+    return result.output_parsed.classified_breaks
+  }
+  if (result.output_text) {
+    try {
+      const parsed = JSON.parse(result.output_text)
+      return parsed?.classified_breaks ?? null
+    } catch {
+      return null
+    }
+  }
+  return null
+})
+const fixerSummary = computed(() => fixerClassified.value?.summary ?? null)
+const fixerAuto = computed(() => fixerClassified.value?.auto_candidates ?? [])
+const fixerManual = computed(() => fixerClassified.value?.manual_candidates ?? [])
 
 const reportMarkdown = computed(() => {
   const result = reportResponseData.value?.result

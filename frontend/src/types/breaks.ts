@@ -9,6 +9,10 @@ export interface BreakItem {
   recommended_action?: string
   approved_for_auto_correction?: boolean
   rationale?: string
+  // acceptance-related fields
+  accepted?: boolean
+  accepted_by?: string
+  accepted_at?: string
 }
 
 
