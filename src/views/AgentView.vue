@@ -13,6 +13,12 @@
       <div v-else class="text-gray-800 mt-4 whitespace-pre-line">
         {{ response }}
       </div>
+      <button
+        @click="fetchResponse"
+        class="mt-8 px-6 py-3 bg-blue-600 text-white font-medium rounded-xl hover:bg-blue-700 transition"
+      >
+        Ask Again
+      </button>
 
     </div>
   </div>
