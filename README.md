@@ -73,19 +73,18 @@ Platform used: OpenAI AgentKit
 ### Start the backend
 
 Windows (from repo root):
-```bat
+```powershell
 cd backend
-pip install -r requirements.txt
 venv\Scripts\activate
-cd ..
-uvicorn backend.server:app --reload
+pip install -r requirements.txt
+uvicorn server:app --reload
 ```
 
 macOS/Linux:
 ```bash
 cd backend
-pip install -r requirements.txt
 source venv/bin/activate
+pip install -r requirements.txt
 uvicorn server:app --reload
 ```
 
