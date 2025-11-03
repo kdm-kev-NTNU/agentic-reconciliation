@@ -167,7 +167,7 @@ Consolidating simpler agents into larger reasoning models can enhance throughput
 
 ### In-house model development
 
-- Data Control and Long-Term Resilience
+Data Control and Long-Term Resilience
 Developing an in-house reconciliation model would allow NBIM to embed its proprietary logic directly into the architecture, maintaining full control over data handling and model behavior.
 This approach strengthens compliance with data residency regulations, enhances security, and reduces long-term dependency on external APIs — while allowing continuous fine-tuning based on NBIM’s evolving reconciliation policies.
 
