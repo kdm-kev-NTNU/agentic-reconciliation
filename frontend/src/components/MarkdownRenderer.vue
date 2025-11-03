@@ -1,6 +1,5 @@
 <template>
   <div class="markdown-body" v-html="html"></div>
-  
 </template>
 
 <script setup lang="ts">
@@ -8,9 +7,7 @@ import { computed } from 'vue'
 import MarkdownIt from 'markdown-it'
 import DOMPurify from 'dompurify'
 
-const props = defineProps<{
-  content: string
-}>()
+const props = defineProps<{ content: string | null | undefined }>()
 
 const md = new MarkdownIt({ html: false, linkify: true, breaks: true, typographer: true })
 
@@ -34,9 +31,23 @@ md.renderer.rules.link_open = function(tokens, idx, options, env, self) {
 
 const html = computed(() => {
   let raw = typeof props.content === 'string' ? props.content : ''
-  // If the entire content is wrapped in a markdown code fence, unwrap it for proper rendering
-  const m = raw.trim().match(/^```(?:markdown|md)?\n([\s\S]*)\n```$/)
-  if (m && m[1]) raw = m[1]
+
+  // If content STARTS with a fenced markdown block (```/~~~ with md/markdown)
+  // but also has additional content after, unwrap only the first fenced block.
+  const startsWithFence = raw.match(/^\s*(```|~~~)\s*(?:markdown|md)\s*\r?\n([\s\S]*?)\r?\n\1\s*(?:\r?\n)?([\s\S]*)$/i)
+  if (startsWithFence && (startsWithFence[2] || startsWithFence[3] !== undefined)) {
+    const inner = startsWithFence[2] || ''
+    const rest = startsWithFence[3] || ''
+    raw = `${inner}\n${rest}`.trimStart()
+  } else {
+    // If the entire content is exactly one fenced block (no trailing content), unwrap it
+    const trimmed = raw.trim()
+    const wholeFence = trimmed.match(/^(```|~~~)\s*(?:markdown|md)?\r?\n([\s\S]*?)\r?\n\1$/i)
+    if (wholeFence && wholeFence[2]) {
+      raw = wholeFence[2]
+    }
+  }
+
   const rendered = md.render(raw)
   return DOMPurify.sanitize(rendered)
 })
@@ -61,5 +72,4 @@ const html = computed(() => {
 .markdown-body a { color: #2563eb; text-decoration: underline; }
 .markdown-body img { max-width: 100%; height: auto; border-radius: .25rem; }
 </style>
-
 
