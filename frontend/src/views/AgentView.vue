@@ -52,13 +52,50 @@
         :manual-candidates="manualCandidates"
       />
 
+      <div v-if="classifiedBreaks" class="mt-2 flex items-center gap-3">
+        <button
+          @click="runBreaksFixer"
+          :disabled="isFixing"
+          class="px-4 py-2 rounded-lg font-semibold text-white transition disabled:bg-gray-400 disabled:cursor-not-allowed bg-purple-600 hover:bg-purple-700"
+        >
+          Run Breaks Fixer
+        </button>
+        <span v-if="isFixing" class="text-blue-700">Running…</span>
+      </div>
+
+      <div v-if="fixerErrorMessage" class="mt-2 p-3 rounded bg-red-100 text-red-800">{{ fixerErrorMessage }}</div>
+
+
+      <details v-if="fixerResponseData" class="bg-gray-50 border rounded-xl p-4">
+        <summary class="cursor-pointer text-sm text-gray-600">Show raw Breaks Fixer JSON</summary>
+        <pre class="mt-3 bg-white border rounded p-3 text-xs overflow-auto">{{ formattedFixerResponse }}</pre>
+      </details>
+
+      <div v-if="fixerResponseData" class="mt-3 flex items-center gap-3">
+        <button
+          @click="generateReport"
+          :disabled="isGeneratingReport"
+          class="px-4 py-2 rounded-lg font-semibold text-white transition disabled:bg-gray-400 disabled:cursor-not-allowed bg-green-600 hover:bg-green-700"
+        >
+          Generate Report
+        </button>
+        <span v-if="isGeneratingReport" class="text-blue-700">Generating…</span>
+      </div>
+
+      <div v-if="reportErrorMessage" class="mt-2 p-3 rounded bg-red-100 text-red-800">{{ reportErrorMessage }}</div>
+
+      <details v-if="reportResponseData" class="bg-gray-50 border rounded-xl p-4">
+        <summary class="cursor-pointer text-sm text-gray-600">Show raw Report JSON</summary>
+        <pre class="mt-3 bg-white border rounded p-3 text-xs overflow-auto">{{ formattedReportResponse }}</pre>
+      </details>
+
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { onMounted, ref, computed } from 'vue'
-import { requestIdentifyBreaks, getCachedIdentifyBreaks } from '@/services/workflowService'
+import { requestIdentifyBreaks, getCachedIdentifyBreaks, requestBreaksFixer, getCachedBreaksFixer, requestReportGeneration, getCachedReport } from '@/services/workflowService'
 import BreakDisplay from '@/components/BreakDisplay.vue'
 import BreakSummary from '@/components/BreakSummary.vue'
 
@@ -68,9 +105,23 @@ const custodyFile = ref<File | null>(null)
 const isLoading = ref(false)
 const errorMessage = ref<string | null>(null)
 const responseData = ref<any | null>(null)
+const isFixing = ref(false)
+const fixerErrorMessage = ref<string | null>(null)
+const fixerResponseData = ref<any | null>(null)
+const isGeneratingReport = ref(false)
+const reportErrorMessage = ref<string | null>(null)
+const reportResponseData = ref<any | null>(null)
 
 const formattedResponse = computed(() =>
   responseData.value ? JSON.stringify(responseData.value, null, 2) : ''
+)
+
+const formattedFixerResponse = computed(() =>
+  fixerResponseData.value ? JSON.stringify(fixerResponseData.value, null, 2) : ''
+)
+
+const formattedReportResponse = computed(() =>
+  reportResponseData.value ? JSON.stringify(reportResponseData.value, null, 2) : ''
 )
 
 const classifiedBreaks = computed(() => {
@@ -134,5 +185,41 @@ onMounted(() => {
   if (cached) {
     responseData.value = cached
   }
+  const cachedFix = getCachedBreaksFixer()
+  if (cachedFix) {
+    fixerResponseData.value = cachedFix
+  }
+  const cachedReport = getCachedReport()
+  if (cachedReport) {
+    reportResponseData.value = cachedReport
+  }
 })
+
+const runBreaksFixer = async () => {
+  isFixing.value = true
+  fixerErrorMessage.value = null
+  try {
+    const data = await requestBreaksFixer()
+    fixerResponseData.value = data
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'Unexpected error'
+    fixerErrorMessage.value = message
+  } finally {
+    isFixing.value = false
+  }
+}
+
+const generateReport = async () => {
+  isGeneratingReport.value = true
+  reportErrorMessage.value = null
+  try {
+    const data = await requestReportGeneration()
+    reportResponseData.value = data
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'Unexpected error'
+    reportErrorMessage.value = message
+  } finally {
+    isGeneratingReport.value = false
+  }
+}
 </script>
