@@ -41,10 +41,22 @@ graph TD
 - Node.js 20+
 
 ### Start the backend
+
+Windows (from repo root):
+```bat
+cd backend
+pip install -r requirements.txt
+venv\Scripts\activate
+cd ..
+uvicorn backend.server:app --reload
+```
+
+macOS/Linux:
 ```bash
 cd backend
 pip install -r requirements.txt
-uvicorn server:app --host 127.0.0.1 --port 8000 --reload
+source venv/bin/activate
+uvicorn server:app --reload
 ```
 
 ### Start the frontend
