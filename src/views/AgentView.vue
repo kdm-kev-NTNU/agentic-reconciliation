@@ -1,9 +1,10 @@
 <template>
-  <div class="flex items-center justify-center min-h-screen bg-gray-50">
-    <div class="p-6 bg-white rounded-xl shadow-lg w-full max-w-md">
-      <h1 class="text-xl font-bold text-gray-800">Agent Workflow Test</h1>
+  <div class="flex flex-col items-center justify-center min-h-screen bg-gray-50 p-6">
+    <div class="w-full max-w-xl bg-white rounded-2xl shadow-lg p-8 text-center">
+      <h1 class="text-2xl font-bold mb-6 text-gray-800">🌤 Agent Workflow Test</h1>
+
       <div v-if="loading" class="text-gray-500 animate-pulse">
-        Asking the model…
+        Asking the model: “What is the weather like today?”
       </div>
 
       <div v-else-if="error" class="text-red-500 mt-4">
@@ -13,13 +14,13 @@
       <div v-else class="text-gray-800 mt-4 whitespace-pre-line">
         {{ response }}
       </div>
+
       <button
         @click="fetchResponse"
         class="mt-8 px-6 py-3 bg-blue-600 text-white font-medium rounded-xl hover:bg-blue-700 transition"
       >
         Ask Again
       </button>
-
     </div>
   </div>
 </template>
