@@ -61,8 +61,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import axios from 'axios'
+import { onMounted, ref, computed } from 'vue'
+import { requestIdentifyBreaks, getCachedIdentifyBreaks } from '@/services/workflowService'
 import BreakDisplay from '@/components/BreakDisplay.vue'
 import BreakSummary from '@/components/BreakSummary.vue'
 
@@ -123,31 +123,20 @@ const identifyBreaks = async () => {
   responseData.value = null
 
   try {
-    const formData = new FormData()
-    formData.append('input_as_text', 'Identify breaks between nbim and custody files')
-    formData.append('nbim_file', nbimFile.value)
-    formData.append('custody_file', custodyFile.value)
-
-    const { data } = await axios.post('http://127.0.0.1:8000/api/run-workflow', formData)
-    if (data && data.success === false) {
-      throw new Error(data.error || 'Workflow failed')
-    }
+    const data = await requestIdentifyBreaks(nbimFile.value, custodyFile.value)
     responseData.value = data
   } catch (err: unknown) {
-    let message = 'Unexpected error'
-    if (axios.isAxiosError(err)) {
-      const serverData = err.response?.data as any
-      if (serverData && typeof serverData === 'object' && 'error' in serverData) {
-        message = serverData.error || err.message
-      } else {
-        message = `${err.message}${err.response ? ` (${err.response.status})` : ''}`
-      }
-    } else if (err instanceof Error) {
-      message = err.message
-    }
+    const message = err instanceof Error ? err.message : 'Unexpected error'
     errorMessage.value = message
   } finally {
     isLoading.value = false
   }
 }
+
+onMounted(() => {
+  const cached = getCachedIdentifyBreaks()
+  if (cached) {
+    responseData.value = cached
+  }
+})
 </script>
