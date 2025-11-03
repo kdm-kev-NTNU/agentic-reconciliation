@@ -62,6 +62,7 @@ This system architecture is meant to mitigate the risks discussed above.
 
 <img width="989" height="349" alt="bilde" src="https://github.com/user-attachments/assets/9f8505a9-f98d-45f4-936b-d28e498b4cf3" />
 
+Platform used: OpenAI AgentKit
 
 ## Quick Start
 
