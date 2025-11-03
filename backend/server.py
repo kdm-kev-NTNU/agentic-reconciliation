@@ -18,7 +18,24 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 load_dotenv()
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi import FastAPI
+
 app = FastAPI(title="Agentic Reconciliation Backend")
+
+# ✅ Allow your frontend origin
+origins = [
+    "http://localhost:5173",   # local dev frontend
+    "https://your-frontend-domain.com"  # (optional) production domain
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],   # allow POST, GET, etc.
+    allow_headers=["*"],   # allow all headers
+)
 
 
 @app.post("/api/run-workflow")
