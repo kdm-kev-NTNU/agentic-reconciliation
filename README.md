@@ -8,12 +8,12 @@
 
 ## Project Overview
 
-This system transforms manual dividend reconciliation into an agent‑driven flow. It identifies breaks between NBIM and Custody datasets, triages them into auto vs. manual candidates, and produces a readable audit report.
+This system transforms manual dividend reconciliation into an agent-driven flow, implemented through **OpenAI’s Agentic Builder and API**. It identifies breaks between NBIM and Custody datasets, triages them into auto vs. manual candidates, and produces a readable audit report.
 
 - **Frontend**: Minimal Vue 3 interface for file upload, results visualization, and report rendering.
 - **Backend**: FastAPI service exposing a single workflow endpoint.
-- **Agents**: Well‑scoped prompts per stage (validation → detection → classification → correction → audit).
-
+- **Agents**: Well-scoped prompts per stage (validation → detection → classification → correction → audit), orchestrated through the Agentic Builder.
+  
 ## Key Features
 
 - **Agentic pipeline**: Validation, Break Detection, Classification, Correction, and Audit Reporting.
@@ -143,6 +143,8 @@ All prompt templates are in `prompt_docs/` and correspond to the pipeline stages
 - `5_correction_agent.md`: Correction & Audit Execution with safe auto‑corrections and manual recommendations.
 - `6_auditing_agent.md`: Audit Trail & Report Generation that aggregates results into Markdown.
 
+source: https://platform.openai.com/docs/guides/prompt-engineering 
+
 ## Future Development
 
 ### Accuracy
@@ -164,4 +166,3 @@ All prompt templates are in `prompt_docs/` and correspond to the pipeline stages
 - In-house model development – more control and:
 - Developing an in-house model would allow NBIM to tailor the system to its own reconciliation logic, ensuring stricter data governance and full control over sensitive financial information — while reducing long-term dependency on third-party APIs.
 
-source: https://platform.openai.com/docs/guides/prompt-engineering 
