@@ -28,6 +28,14 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 
+import OpenAI from 'openai'
+
+const client = new OpenAI({
+  apiKey: import.meta.env.VITE_OPENAI_PUBLIC_KEY,
+  dangerouslyAllowBrowser: true,
+})
+const WORKFLOW_ID = import.meta.env.VITE_WORKFLOW_ID
+
 
 const response = ref('')
 const error = ref<string | null>(null)
