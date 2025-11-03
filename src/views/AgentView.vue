@@ -29,26 +29,22 @@
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
 
-const API_BASE = import.meta.env.VITE_API_BASE
+const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:3001"
 
 const response = ref('')
 const error = ref<string | null>(null)
-const loading = ref(true)
-const userText = ref('')
+const loading = ref(false)
+
+const userText = "What is the weather like today?"
 
 async function fetchResponse() {
-  if (!userText.value.trim()) {
-    error.value = 'Please enter a question first.'
-    return
-  }
-
   loading.value = true
   error.value = null
   response.value = ''
 
   try {
-    const res = await axios.post(`${API_BASE}/run-workflow`, {
-      input_as_text: userText.value,
+    const res = await axios.post(`${API_BASE}/api/run-workflow`, {
+      input_as_text: userText
     })
     response.value = res.data.result || 'No response received.'
   } catch (err: any) {
@@ -59,5 +55,4 @@ async function fetchResponse() {
 }
 
 onMounted(fetchResponse)
-
 </script>
