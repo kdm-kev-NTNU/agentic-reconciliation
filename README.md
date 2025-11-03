@@ -58,17 +58,10 @@ Mitigations:
 The objective is to sustain high performance at minimal operational cost through data-driven experimentation.
 
 ## System Architecture
+This system architecture is meant to mitigate the risks discussed above.
 
-```mermaid
-graph TD
-  A[Upload NBIM & Custody CSVs] --> B[Backend /api/run-workflow]
-  B --> C[Validation]
-  C --> D[Break Detection]
-  D --> E[Classification]
-  E --> F[Correction]
-  F --> G[Audit Report]
-  G --> H[Frontend: Summary & Markdown Report]
-```
+<img width="989" height="349" alt="bilde" src="https://github.com/user-attachments/assets/9f8505a9-f98d-45f4-936b-d28e498b4cf3" />
+
 
 ## Quick Start
 
