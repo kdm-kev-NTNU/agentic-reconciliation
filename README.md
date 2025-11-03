@@ -21,6 +21,42 @@ This system transforms manual dividend reconciliation into an agent‑driven flo
 - **Context carry‑over**: Stage outputs are persisted and reused to improve downstream steps.
 - **Readable reporting**: Final compliance narrative is generated in Markdown and rendered in the UI.
 
+## Risk Assessment
+
+This section outlines the key technical and financial risks considered during the design of the Agentic Reconciliation System for NBIM. The goal is to balance innovation, data security, and operational efficiency while maintaining transparency and cost predictability.
+
+### Technical Risks
+
+#### 1. API Dependency & Data Privacy
+Reliance on third-party APIs introduces risks around data exposure and control, especially given the sensitivity of financial records.
+
+Mitigations:
+
+- In-house model creation: Build or fine-tune proprietary LLMs internally to maintain full control of data processing.
+- Enterprise agreements: Secure long-term, well-defined partnerships to ensure predictable costs, stable access, and compliance with privacy and residency regulations.
+
+These strategies help guarantee data integrity, predictability, and compliance over time.
+
+#### 2. Response Variability & Accuracy
+LLMs can yield slightly different responses for identical inputs, which can impact consistency in reconciliation results.
+
+Mitigations:
+
+- Human-in-the-loop: Enable human review at key decision points to validate model outputs and correct misclassifications.
+- Multi-agent system structure: Use several specialized agents instead of a single monolithic model to achieve clearer role delineations, more efficient prompt engineering, and better accuracy.
+
+### Financial Risks
+
+#### 1. Opportunity Cost
+The main financial risk is the opportunity cost of not reaching the most efficient agent configuration—where suboptimal choices in model size or role granularity lead to higher latency and token costs, even when similar accuracy could be achieved with a leaner setup.
+
+Mitigations:
+
+- A/B testing: Continuously evaluate different architectures to identify the most efficient agent combinations.
+- Architecture optimization: Avoid overly granular agent setups that increase latency and token costs without proportional accuracy gains.
+
+The objective is to sustain high performance at minimal operational cost through data-driven experimentation.
+
 ## System Architecture
 
 ```mermaid
