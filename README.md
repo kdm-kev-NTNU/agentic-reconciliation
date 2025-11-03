@@ -146,8 +146,6 @@ source: https://platform.openai.com/docs/guides/prompt-engineering
 
 ## Future Development
 
-### Accuracy
-
 ### Backtesting & RAG Integration (aligned with NBIM’s procedures)
 
 Conduct systematic backtesting on historical reconciliation cases to quantify model accuracy and identify recurring error patterns.
