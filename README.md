@@ -143,4 +143,25 @@ All prompt templates are in `prompt_docs/` and correspond to the pipeline stages
 - `5_correction_agent.md`: Correction & Audit Execution with safe auto‑corrections and manual recommendations.
 - `6_auditing_agent.md`: Audit Trail & Report Generation that aggregates results into Markdown.
 
+## Future Development
+
+### Accuracy
+
+- Backtesting & RAG (NBIM’s procedures)
+- Repeat batches – check inconsistency
+- Perform backtests using historical dividend reconciliation cases to evaluate model precision and error consistency.
+- Implement RAG (Retrieval-Augmented Generation) so agents can reference NBIM procedures and industry standards — ensuring consistent decision logic.
+- Running the same batch several times to check which suggestions stay consistent, since the model isn’t perfectly deterministic. – this makes correction and improvement more stable
+
+### Scalability
+
+- Scalability – fewer dependencies
+- Ensuring Scalability
+- Restructure the to reduce human dependency and number of agents to increasing automation efficiency.
+
+### In-house model development
+
+- In-house model development – more control and:
+- Developing an in-house model would allow NBIM to tailor the system to its own reconciliation logic, ensuring stricter data governance and full control over sensitive financial information — while reducing long-term dependency on third-party APIs.
+
 source: https://platform.openai.com/docs/guides/prompt-engineering 
