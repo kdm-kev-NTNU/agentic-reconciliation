@@ -2,6 +2,18 @@
   <div class="flex items-center justify-center min-h-screen bg-gray-50">
     <div class="p-6 bg-white rounded-xl shadow-lg w-full max-w-md">
       <h1 class="text-xl font-bold text-gray-800">Agent Workflow Test</h1>
+      <div v-if="loading" class="text-gray-500 animate-pulse">
+        Asking the model…
+      </div>
+
+      <div v-else-if="error" class="text-red-500 mt-4">
+        {{ error }}
+      </div>
+
+      <div v-else class="text-gray-800 mt-4 whitespace-pre-line">
+        {{ response }}
+      </div>
+
     </div>
   </div>
 </template>
