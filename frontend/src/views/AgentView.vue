@@ -52,10 +52,6 @@
         :manual-candidates="manualCandidates"
       />
 
-      <details class="bg-gray-50 border rounded-xl p-4">
-        <summary class="cursor-pointer text-sm text-gray-600">Show raw JSON</summary>
-        <pre class="mt-3 bg-white border rounded p-3 text-xs overflow-auto">{{ formattedResponse }}</pre>
-      </details>
     </div>
   </div>
 </template>
