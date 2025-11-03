@@ -38,6 +38,26 @@ app.add_middleware(
 async def health_check():
     return {"status": "ok", "message": "Backend is running and healthy"}
 
+@app.post("/api/run-workflow")
+async def run_agentic_workflow(payload: dict):
+    """
+    Expects JSON body with "input_as_text" field:
+        { "input_as_text": "<user input>" }
+    Returns:
+        Full workflow response JSON
+    """
+    user_text = (payload or {}).get("input_as_text", "").strip()
+    if not user_text:
+        return {"error": "Missing 'input_as_text' in request body"}
+
+    print(f"Received user input: {user_text}")
+    result = await run_workflow_direct(user_text)
+
+    if isinstance(result, dict) and "output_text" in result:
+        return {"result": result["output_text"], "raw": result}
+
+    return result
+
 
 async def run_workflow_direct(user_text: str):
     """
