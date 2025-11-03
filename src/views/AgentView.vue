@@ -27,9 +27,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import axios from 'axios'
 
-const API_BASE = import.meta.env.VITE_API_BASE
 
 const response = ref('')
 const error = ref<string | null>(null)
@@ -46,16 +44,6 @@ async function fetchResponse() {
   error.value = null
   response.value = ''
 
-  try {
-    const res = await axios.post(`${API_BASE}/run-workflow`, {
-      input_as_text: userText.value,
-    })
-    response.value = res.data.result || 'No response received.'
-  } catch (err: any) {
-    error.value = err.message || 'Failed to contact backend.'
-  } finally {
-    loading.value = false
-  }
 }
 
 onMounted(fetchResponse)
