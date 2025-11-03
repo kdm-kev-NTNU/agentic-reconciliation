@@ -225,10 +225,31 @@ export function getCachedBreaksFixer(): any | null {
 export async function requestReportGeneration(): Promise<any> {
   const formData = new FormData()
   formData.append('input_as_text', 'Generate a reconciliation report based on the current state')
-  const ctx = buildContext()
-  if (Object.keys(ctx).length) {
-    formData.append('context', JSON.stringify(ctx))
-  }
+  // Include everything from localStorage as context
+  try {
+    const all: Record<string, any> = {}
+    const included: string[] = []
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i)
+      if (!key) continue
+      try {
+        const raw = localStorage.getItem(key)
+        if (raw == null) continue
+        try {
+          all[key] = JSON.parse(raw)
+        } catch {
+          all[key] = raw
+        }
+        included.push(key)
+      } catch {
+        // skip
+      }
+    }
+    console.log('[workflow] Report context includes all localStorage keys:', included)
+    if (Object.keys(all).length) {
+      formData.append('context', JSON.stringify(all))
+    }
+  } catch {}
 
   const { data } = await axios.post(`${API_BASE}/api/run-workflow`, formData)
   if (data && data.success === false) {
